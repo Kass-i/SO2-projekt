@@ -57,13 +57,25 @@ def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((HOST, PORT))
     server.listen()
+    server.settimeout(0.5)
 
     print(f"Server is listening on {HOST}:{PORT}")
 
-    while True:
-        client_socket, address = server.accept()
-        thread = threading.Thread(target=handle_client, args=(client_socket, address))
-        thread.start()
+    try:
+        while True:
+            try:
+                client_socket, address = server.accept()
+                thread = threading.Thread(target=handle_client, args=(client_socket, address))
+                thread.daemon = True
+                thread.start()
+            except socket.timeout:
+                continue
+    except KeyboardInterrupt:
+        print("⛔ Stopped the server with Ctrl+C")
+    finally:
+        server.close()
+        print("👋 Server closed.")
+        input("Press any key...")
 
 
 
