@@ -34,3 +34,5 @@
 
 # VSC
 .vscode/
+
+venv/

@@ -1,0 +1,6 @@
+{
+  "host": "localhost",
+  "port": 5555,
+  "size": 1024,
+  "disconnected_msg": ">exit"
+}
