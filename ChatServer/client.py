@@ -11,6 +11,9 @@ SIZE = config["size"]
 DISCONNECTED_MSG = config["disconnected_msg"]
 disconnected = False
 
+BLUE = "\033[94m"
+RESET_COLOR = "\033[0m"
+
 
 def receive_messages(sock):
     global disconnected
@@ -50,10 +53,11 @@ def main():
             if msg == DISCONNECTED_MSG:
                 client_socket.send(msg.encode())
                 break
-            full_msg = f"{username}: {msg}"
+            full_msg = f"{BLUE}{username}{RESET_COLOR}: {msg}"
             client_socket.send(full_msg.encode())
     finally:
         client_socket.close()
+
 
 if __name__ == "__main__":
     main()
