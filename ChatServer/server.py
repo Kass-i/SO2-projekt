@@ -80,4 +80,9 @@ def start_server():
 
 
 if __name__ == "__main__":
-    start_server()
+    try:
+        start_server()
+    except KeyboardInterrupt:
+        print("⛔ Stopped the server with Ctrl+C")
+        print("👋 Server closed.")
+        input("Press any key...")

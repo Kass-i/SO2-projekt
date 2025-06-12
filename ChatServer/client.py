@@ -55,8 +55,11 @@ def main():
                 break
             full_msg = f"{BLUE}{username}{RESET_COLOR}: {msg}"
             client_socket.send(full_msg.encode())
+    except KeyboardInterrupt:
+        print("⛔ Chat interrupted with Ctrl+C. Exiting.")
     finally:
         client_socket.close()
+        input("Press any key...\n")
 
 
 if __name__ == "__main__":
