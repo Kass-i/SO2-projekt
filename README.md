@@ -4,7 +4,9 @@ Celem zajęć jest wykonanie aplikacji wykorzystującej wielowątkowość oraz w
 
 ## Instrukcja uruchomienia projektów
 
-Każdy projekt znajduje się w osobnym folderze, w który należy wejść. Znajdują się w nich pliki Makefile.
+Każdy projekt znajduje się w osobnym folderze, w który należy wejść.
+
+### Projekt 1
 1. Sprawdź obecność narzędzia `make` poprzez wpisanie w terminalu:
     ```bash
     make --version
@@ -32,6 +34,29 @@ Każdy projekt znajduje się w osobnym folderze, w który należy wejść. Znajd
 4. Wyczyść pliki za pomocą:
     ```bash
     make clean
+    ```
+
+### Projekt 2
+1. Sprawdź obecność pythona poprzez wpisanie w terminalu:
+    ```bash
+    which python
+    ```
+    Jeśli zobaczysz ścieżkę, to znaczy, że python jest zainstalowany. Jeśli nie to zainstaluj z [oficjalnej strony](https://www.python.org/downloads).
+2. Utwórz środowisko wirtualne `.venv`:
+  * Na Ubuntu:
+    ```bash
+    python3 -m venv .venv
+    . venv/bin/activate
+    ```
+  * Na Windowsie:
+      ```bash
+      python -m venv .venv
+      .venv\Scripts\activate
+      ```
+3. Uruchom program za pomocą:
+    ```bash
+    python ./server.py
+    python ./client.py
     ```
 
 ## Projekt 1 - Problem jedzących filozofów
@@ -74,3 +99,26 @@ Implementacja polega na przypisaniu każdemu filozofowi stanu (Myśli, Głoduje,
   * Następnie poprzez `acquire()` następuje próba zdobycia widelców - jeśli w poprzednim kroku semafor został zwolniony (czyli możliwe jest podniesienie widelców) to przejmuje zasób, a w przeciwnym wypadku czeka, aż zasób będzie zwolniony.
 * Gdy filozof kończy jedzenie to w `putDownForks()` następuje sprawdzenie sąsiadów poprzez `checkPhilosopher()`, czyli czy są głodni i mają zwolniony drugi widelec.
   Dzięki temu sąsiedzi od razu po zwolnieniu widelców mogą zabrać się za jedzenie, dzięki czemu pozbyto się problemu zagłodzenia.
+
+
+## Projekt 2 - Wielowątkowy serwer czatu
+
+### Opis projektu
+
+Należało zaimplementować Wielowątkowy serwer czatu, gdzie:
+* Serwer tworzy osobny wątek dla każdego połączenia od klienta
+* Serwer dba o synchronizację wiadomości od klientów
+* Klient widzi wiadomości w chacie
+* Klient ma możliwość wysyłania wiadomości
+
+### Wątki
+
+Serwer (`server.py`) tworzy osobny wątek dla każdego nowego klienta. Dzięki temu wielu klientów może być obsługiwanych równolegle bez blokowania głównego wątku `accept()`.
+Klient (`client.py`) korzysta z dwóch wątków:
+- główny wątek: pobiera dane od użytkownika (`input()`),
+- drugi wątek: w tle odbiera wiadomości z serwera i je wyświetla.
+
+### Sekcje krytyczne
+
+Lista `clients[]` w serwerze zawiera aktywne połączenia. Ponieważ wiele wątków może modyfikować tę listę jednocześnie (klienci mogą dodać siebie do listy (`append`), usunąć siebie (`remove`) lub wysyłać wiadomość innym — czyli czytać listę (`for client in clients`)), 
+jej obsługa wymaga synchronizacji. Dlatego w tych fragmentach skorzystano z `with clients_lock:` dla `clients_lock = threading.Lock()`. Lock zapewnia, że tylko jeden wątek naraz ma dostęp do chronionej sekcji kodu. Konstrukcja `with clients_lock:` działa w ten sposób, że wątek, który pierwszy wejdzie w sekcję krytyczną, blokuje dostęp innym wątkom, aż zakończy wykonywanie tej części kodu.
